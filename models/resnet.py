@@ -70,7 +70,7 @@ class ResNetBuilder:
 
         return X
 
-    def data_augmentation_block():
+    def data_augmentation_block(self):
 
         data_augmentaion = tf.keras.Sequential(
             [
