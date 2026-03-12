@@ -24,9 +24,8 @@ early_stop_callback = tf.keras.callbacks.EarlyStopping(
     restore_best_weights=True,
 )
 
-
-train_debug_ds = train_ds.shuffle(10000).take(100)
-val_debug_ds = val_ds.take(100)
+train_debug_ds = train_ds.take(100)
+val_debug_ds = val_ds.shuffle(10000).take(100)
 
 model.fit(
     train_debug_ds,

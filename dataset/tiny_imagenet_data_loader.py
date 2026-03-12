@@ -30,7 +30,6 @@ class TinyImageNetDataLoader:
         image = tf.io.read_file(path)
         image = tf.image.decode_jpeg(image, channels=3)
         image = tf.image.resize(image, (64, 64))
-        image = tf.cast(image, tf.float32) / 255.0
         return image, label
 
     def _build_train_dataset(self) -> None:
@@ -91,12 +90,12 @@ class TinyImageNetDataLoader:
         self.val_dataset = val_dataset
 
     def get_train_dataset(self) -> tf.data.Dataset:
-        if not self.train_dataset:
+        if self.train_dataset is None:
             self._build_train_dataset()
         return self.train_dataset
 
     def get_val_dataset(self) -> tf.data.Dataset:
-        if not self.val_dataset:
+        if self.val_dataset is None:
             self._build_val_dataset()
         return self.val_dataset
 
@@ -110,6 +109,4 @@ if __name__ == "__main__" :
 
     loader = TinyImageNetDataLoader()
     train_ds, val_ds = loader.get_train_val_dataset()
-    for images, labels in val_ds.take(1):
-        for image, label in zip(images[:10],labels[:10]) :
-            print(f"{loader.index_to_label_map[int(label)]}")
+    
