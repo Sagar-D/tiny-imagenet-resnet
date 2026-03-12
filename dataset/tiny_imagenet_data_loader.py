@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 import pandas as pd
 import tensorflow as tf
+import numpy as np
 
 
 class TinyImageNetDataLoader:
@@ -10,7 +11,6 @@ class TinyImageNetDataLoader:
     def __init__(self, batch_size=128):
         
         self.batch_size = batch_size
-
         self.dataset_path = None
         self.labels = []
         self.label_to_index_map = {}
@@ -50,14 +50,18 @@ class TinyImageNetDataLoader:
 
         training_labels = [self.label_to_index_map[label] for label in training_labels]
 
+        randomized_indices = np.random.permutation(len(training_images))
+        training_images = [training_images[i] for i in randomized_indices]
+        training_labels = [training_labels[i] for i in randomized_indices]
+
         train_dataset = tf.data.Dataset.from_tensor_slices(
             (training_images, training_labels)
         )
+        train_dataset = train_dataset.shuffle(10000)
         train_dataset = train_dataset.map(
             self._load_image, num_parallel_calls=tf.data.AUTOTUNE
         )
         train_dataset = train_dataset.cache()
-        train_dataset = train_dataset.shuffle(10000)
         train_dataset = train_dataset.batch(self.batch_size)
         train_dataset = train_dataset.prefetch(tf.data.AUTOTUNE)
         self.train_dataset = train_dataset
