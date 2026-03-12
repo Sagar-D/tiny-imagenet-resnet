@@ -85,7 +85,8 @@ class ResNetBuilder:
 
         inputs = tf.keras.layers.Input(shape=(64, 64, 3))
 
-        X = self.data_augmentation_block()(inputs)
+        X = tf.keras.layers.Rescaling(1./255)(inputs)
+        X = self.data_augmentation_block()(X)
 
         X = tf.keras.layers.Conv2D(
             filters=64,

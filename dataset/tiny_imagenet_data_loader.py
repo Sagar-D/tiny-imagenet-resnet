@@ -42,7 +42,11 @@ class TinyImageNetDataLoader:
             training_labels.append(image_path.parent.parent.name)
 
         self.labels = sorted(set(training_labels))
-        self.label_to_index_map = {label: i for i, label in enumerate(self.labels)}
+        self.label_to_index_map = {}
+        self.index_to_label_map = {}
+        for i, label in enumerate(self.labels) :
+            self.label_to_index_map[label] = i
+            self.index_to_label_map[i] = label
 
         training_labels = [self.label_to_index_map[label] for label in training_labels]
 
@@ -67,13 +71,11 @@ class TinyImageNetDataLoader:
             names=["image_name", "label", "bx1", "by1", "bx2", "by2"],
         )
 
-        val_images = [
-            str(self.dataset_path / "val" / "images" / name)
-            for name in val_annotations["image_name"]
-        ]
-        val_labels = [
-            self.label_to_index_map[label] for label in val_annotations["label"]
-        ]
+        val_images = []
+        val_labels = []
+        for row in val_annotations[["image_name","label"]].itertuples() :
+            val_images.append(str(self.dataset_path / "val" / "images" / row.image_name))
+            val_labels.append(self.label_to_index_map[row.label])
 
         val_dataset = tf.data.Dataset.from_tensor_slices((val_images, val_labels))
         val_dataset = val_dataset.map(
@@ -98,3 +100,12 @@ class TinyImageNetDataLoader:
         self,
     ) -> tuple[tf.data.Dataset, tf.data.Dataset]:
         return (self.get_train_dataset(), self.get_val_dataset())
+
+
+if __name__ == "__main__" :
+
+    loader = TinyImageNetDataLoader()
+    train_ds, val_ds = loader.get_train_val_dataset()
+    for images, labels in val_ds.take(1):
+        for image, label in zip(images[:10],labels[:10]) :
+            print(f"{loader.index_to_label_map[int(label)]}")

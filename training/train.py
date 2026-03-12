@@ -9,7 +9,11 @@ train_ds, val_ds = data_loader.get_train_val_dataset()
 
 model = ResNetBuilder().build_resnet18()
 
-model.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"])
+model.compile(
+    optimizer="adam",
+    loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+    metrics=["accuracy"],
+)
 
 print(model.summary())
 
@@ -20,7 +24,12 @@ early_stop_callback = tf.keras.callbacks.EarlyStopping(
     restore_best_weights=True,
 )
 
-model.fit(train_ds,  validation_data=val_ds, epochs=training_config.EPOCHS, callbacks=[early_stop_callback])
+model.fit(
+    train_ds,
+    validation_data=val_ds,
+    epochs=training_config.EPOCHS,
+    callbacks=[early_stop_callback],
+)
 
 ts = int(time.time())
 model.save(training_config.MODEL_PATH.replace("timestamp", str(ts)), overwrite=True)
