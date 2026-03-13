@@ -10,7 +10,7 @@ train_ds, val_ds = data_loader.get_train_val_dataset()
 model = ResNetBuilder().build_resnet18()
 
 model.compile(
-    optimizer="adam",
+    optimizer=tf.keras.optimizers.Adam(learning_rate=training_config.LEARNING_RATE),
     loss=tf.keras.losses.SparseCategoricalCrossentropy(),
     metrics=["accuracy"],
 )
@@ -24,14 +24,17 @@ early_stop_callback = tf.keras.callbacks.EarlyStopping(
     restore_best_weights=True,
 )
 
-train_debug_ds = train_ds.take(100)
-val_debug_ds = val_ds.shuffle(10000).take(100)
+model_checkpointer = tf.keras.callbacks.ModelCheckpoint(
+    filepath=training_config.CHECKPOINT_PATH,
+    monitor="val_loss",
+    save_best_only=True
+)
 
 model.fit(
-    train_debug_ds,
-    validation_data=val_debug_ds,
+    train_ds,
+    validation_data=val_ds,
     epochs=training_config.EPOCHS,
-    callbacks=[early_stop_callback],
+    callbacks=[early_stop_callback, model_checkpointer],
 )
 
 ts = int(time.time())

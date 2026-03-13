@@ -85,13 +85,13 @@ class ResNetBuilder:
 
         inputs = tf.keras.layers.Input(shape=(64, 64, 3))
 
-        X = tf.keras.layers.Rescaling(1./255)(inputs)
-        X = self.data_augmentation_block()(X)
+        X = self.data_augmentation_block()(inputs)
+        X = tf.keras.layers.Rescaling(1./255)(X)
 
         X = tf.keras.layers.Conv2D(
             filters=64,
-            kernel_size=(7, 7),
-            strides=2,
+            kernel_size=(3, 3),
+            strides=1,
             padding="same",
             kernel_initializer="he_normal",
             kernel_regularizer=tf.keras.regularizers.l2(1e-4)
