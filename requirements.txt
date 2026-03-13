@@ -1,4 +1,7 @@
-tensorflow
+tensorflow-macos; sys_platform == 'darwin' and platform_machine == 'arm64'
+tensorflow-metal; sys_platform == 'darwin' and platform_machine == 'arm64'
+tensorflow[and-cuda]; sys_platform != 'darwin'
 pandas
 kagglehub
 numpy
+argparse

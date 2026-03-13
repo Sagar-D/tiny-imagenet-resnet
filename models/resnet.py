@@ -75,8 +75,11 @@ class ResNetBuilder:
         data_augmentaion = tf.keras.Sequential(
             [
                 tf.keras.layers.RandomFlip("horizontal"),
-                tf.keras.layers.RandomRotation(0.1),
-                tf.keras.layers.RandomZoom(0.1),
+                tf.keras.layers.RandomRotation(0.2),
+                # tf.keras.layers.RandomShear(0.1, 0.1),
+                tf.keras.layers.RandomZoom(0.15),
+                tf.keras.layers.RandomContrast(0.2),
+                tf.keras.layers.RandomBrightness(0.2),
             ]
         )
         return data_augmentaion
@@ -113,6 +116,8 @@ class ResNetBuilder:
         X = self.identity_block(X, filters=512)
 
         X = tf.keras.layers.GlobalAveragePooling2D()(X)
+        X = tf.keras.layers.Dropout(0.1)(X)
+
         outputs = tf.keras.layers.Dense(units=200, activation="softmax")(X)
 
         model = tf.keras.Model(inputs, outputs)
